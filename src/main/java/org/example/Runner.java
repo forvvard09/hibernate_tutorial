@@ -1,56 +1,47 @@
 package org.example;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
+import org.example.configuration.HibernateConfig;
+import org.example.dao.CommentDao;
+import org.example.dao.PostDao;
+import org.example.dao.UserDao;
+import org.example.utils.Statistics;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-
-import java.util.List;
 
 @Slf4j
 public class Runner {
     public static void main(String[] args) {
-        HumanDto humanDto = null;;
 
-        try ( SessionFactory sessionFactory = HibernateConfig.createSessionFactory();
-        Session session = sessionFactory.openSession();) {
-            //Получение данных по уровню изоляции транзакций
-            //session.doWork((connection -> System.out.println(connection.getTransactionIsolation())));
-            try {
-                //Сохраняем данные
-                session.beginTransaction();
-                Passport passport = new Passport("4000", "123456", PassportType.FOREIGN_PASSPORT);
-                Human human = new Human("Yuri", passport);
-                Auto auto = new Auto("bmw", human);
-                session.save(human);
+        UserDao userDao = new UserDao();
+        PostDao postDao = new PostDao();
+        CommentDao commentDao = new CommentDao();
+        Statistics statistics = new Statistics();
 
-                //Эмулируем возникновение ошибки внутри транзакции
-//                int i = 1;
-//                if (i == 1) {
-//                    throw new RuntimeException("Проблема");
-//                }
 
-                session.save(auto);
-                session.getTransaction().commit();
-                session.clear();
+        try (SessionFactory sessionFactory = HibernateConfig.createSessionFactory();
+             Session session = sessionFactory.openSession();) {
 
-                //Читаем сохраненные данные
-                session.beginTransaction();
-                Human human1 = session.get(Human.class, 1);
-                //Получение lazy данных
-                Hibernate.initialize(human1.getCars());
-                //Преобразование в humanDto
-                humanDto = new HumanDto(human1.getId(), human1.getName(), human1.getPassport(), human1.getCars());
-                log.info(human1.toString());
-                session.getTransaction().commit();
 
-            } catch (Exception e) {
-                log.info(e.getMessage());
-                session.getTransaction().rollback();
+
+            /*for (int i =0; i < 10; i++) {
+                userDao.createUser(session);
             }
+
+            for (int i = 0; i < 30; i++) {
+                int userId = SqlUtil.getRandomIdUser(session);
+                postDao.createNewPost(session, userDao.getUserById(session, userId));
+            }
+
+            for (int i = 0; i < 50; i++) {
+                int userId = SqlUtil.getRandomIdUser(session);
+                int postId = SqlUtil.getRandomIdPost(session);
+                commentDao.createNewComment(session, userDao.getUserById(session, userId), postDao.getPostById(session, postId));
+            }*/
+
+
+            statistics.printInfo(session, userDao, postDao, commentDao);
+            statistics.printUserInfo(session, "Annaniev Artem");
         }
-        //Работа с данными из бд вне сессии
-        List<Auto> cars = humanDto.getCars();
-        System.out.println(cars);
     }
 }
