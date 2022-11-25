@@ -24,8 +24,8 @@ public class Comment {
     private String text;
 
     @CreationTimestamp
-    @Column
-    private Timestamp created_at = new Timestamp(System.currentTimeMillis());
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

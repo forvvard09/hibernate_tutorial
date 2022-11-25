@@ -24,8 +24,8 @@ public class Post {
     private String text;
 
     @CreationTimestamp
-    @Column
-    private Timestamp created_at = new Timestamp(System.currentTimeMillis());
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     @OneToMany(mappedBy = "post")
     @ToString.Exclude

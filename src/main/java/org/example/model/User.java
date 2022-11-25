@@ -27,15 +27,22 @@ public class User {
     @NonNull
     private String password;
 
-    @CreationTimestamp
-    @Column
-    private Timestamp created_at = new Timestamp(System.currentTimeMillis());
+    @Embedded
+    @NonNull
+    private Passport passport;
 
-    @OneToMany(mappedBy = "user")
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+    @Column(nullable = false)
+    @OneToMany(mappedBy = "user"/*, fetch = FetchType.LAZY*/)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Post> posts;
 
+    @Column(nullable = false)
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

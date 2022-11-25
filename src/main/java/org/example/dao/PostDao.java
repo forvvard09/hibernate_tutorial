@@ -6,17 +6,16 @@ import org.hibernate.Session;
 
 import java.util.List;
 
-import static org.example.utils.SqlUtil.getRandomPost;
-
 public class PostDao {
 
     public List<Post> getListPosts(Session session) {
-        return session.createQuery("from Post order by created_at DESC", Post.class).list();
+        return session.createQuery("from Post order by createdAt DESC", Post.class).list();
     }
 
-    public void createNewPost(Session session, User user) {
+    public void createNewPost(Session session, String postText, User user) {
         session.beginTransaction();
-        session.saveOrUpdate(new Post(getRandomPost(), user));
+        session.saveOrUpdate(new Post(postText, user));
+        session.flush();
         session.getTransaction().commit();
     }
 
